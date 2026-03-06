@@ -1,16 +1,5 @@
-import { Link } from 'expo-router';
 import React from 'react';
-import { StyleSheet, View } from "react-native";
-
-const styles = StyleSheet.create({
-  input: {
-    height: 40,
-    margin: 12,
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 10
-  },
-});
+import { Text, View } from "react-native";
 
 export default function Index() {
   return (
@@ -21,7 +10,11 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Link href="/views/search">Buscar</Link>
+      <Text style={{
+        fontSize: 24,
+        fontWeight: 'bold',
+        textAlign: 'center'
+      }}>Bem-vindo ao{'\n'}GamingTrak</Text>
     </View>
   );
 }
