@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "rebuild": "watchman watch-del-all && rm -rf ios/build ios/Pods node_modules && npm install && npx expo prebuild --clean && npx expo run:ios",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
