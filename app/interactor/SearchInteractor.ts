@@ -11,6 +11,8 @@ export interface IGDBGame {
   id: number;
   name: string;
   summary?: string;
+  first_release_date?: number;
+  artworks?: Array<{ image_id: string; }>;
 }
 
 export interface IGDBCover {
@@ -39,11 +41,15 @@ export class SearchInteractor {
 
       const games: IGDBGame[] = await response.json();
 
-      // Fetch covers for each game
+      // Fetch covers and artwork for each game
       const gamesWithCovers = await Promise.all(
         games.map(async (game) => ({
-          ...game,
+          id: game.id,
+          name: game.name,
+          summary: game.summary,
+          releaseDate: game.first_release_date,
           coverUrl: await this.fetchGameCover(game.id),
+          backgroundUrl: await this.fetchGameArtwork(game.id),
         }))
       );
 
@@ -73,6 +79,29 @@ export class SearchInteractor {
       return '';
     } catch (error) {
       console.error(`Error fetching cover for game ${gameId}:`, error);
+      return '';
+    }
+  }
+
+  /**
+   * Fetch artwork image for a specific game
+   */
+  private async fetchGameArtwork(gameId: number): Promise<string> {
+    try {
+      const response = await this.makeRequest(
+        'https://api.igdb.com/v4/artworks',
+        `fields *; where game = ${gameId}; limit 1;`
+      );
+
+      const artworks: Array<{ image_id: string; }> = await response.json();
+
+      if (artworks.length > 0) {
+        return `https://images.igdb.com/igdb/image/upload/t_screenshot_big/${artworks[0].image_id}.jpg`;
+      }
+
+      return '';
+    } catch (error) {
+      console.error(`Error fetching artwork for game ${gameId}:`, error);
       return '';
     }
   }

@@ -13,7 +13,7 @@ export default function Index() {
       <Text style={{
         fontSize: 24,
         fontWeight: 'bold',
-        textAlign: 'center'
+        textAlign: 'center',
       }}>Bem-vindo ao{'\n'}GamingTrak</Text>
     </View>
   );

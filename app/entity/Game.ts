@@ -3,4 +3,6 @@ export type Game = {
   name: string;
   summary?: string;
   coverUrl?: string;
+  releaseDate?: number;
+  backgroundUrl?: string;
 };
