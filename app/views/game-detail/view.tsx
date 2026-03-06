@@ -104,7 +104,7 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({
       {backgroundUri && (
         <Image
           source={{ uri: backgroundUri }}
-          blurRadius={3}
+          blurRadius={10}
           style={styles.backgroundImage}
           resizeMode="cover"
         />
