@@ -5,6 +5,7 @@
 
 import secrets from '../../secrets.json';
 import { Game } from '../entity/Game';
+import { igdbAuthService } from '../services/igdbAuthService';
 
 export interface IGDBGame {
   id: number;
@@ -18,11 +19,9 @@ export interface IGDBCover {
 
 export class SearchInteractor {
   private clientId: string;
-  private bearer: string;
 
   constructor() {
     this.clientId = secrets.igdb['client-id'];
-    this.bearer = secrets.igdb.bearer;
   }
 
   /**
@@ -34,18 +33,9 @@ export class SearchInteractor {
     }
 
     try {
-      const response = await fetch('https://api.igdb.com/v4/games', {
-        method: 'POST',
-        headers: {
-          'Client-ID': this.clientId,
-          'Authorization': `Bearer "${this.bearer}"`,
-        },
-        body: `fields *; search "${searchQuery}"; limit 20;`,
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
+      const response = await this.makeRequest('https://api.igdb.com/v4/games',
+        `fields *; search "${searchQuery}"; limit 20;`
+      );
 
       const games: IGDBGame[] = await response.json();
 
@@ -69,18 +59,10 @@ export class SearchInteractor {
    */
   private async fetchGameCover(gameId: number): Promise<string> {
     try {
-      const response = await fetch('https://api.igdb.com/v4/covers', {
-        method: 'POST',
-        headers: {
-          'Client-ID': this.clientId,
-          'Authorization': `Bearer "${this.bearer}"`,
-        },
-        body: `fields *; where game = ${gameId};`,
-      });
-
-      if (!response.ok) {
-        return '';
-      }
+      const response = await this.makeRequest(
+        'https://api.igdb.com/v4/covers',
+        `fields *; where game = ${gameId};`
+      );
 
       const covers: IGDBCover[] = await response.json();
 
@@ -92,6 +74,42 @@ export class SearchInteractor {
     } catch (error) {
       console.error(`Error fetching cover for game ${gameId}:`, error);
       return '';
+    }
+  }
+
+  /**
+   * Make an authenticated request to IGDB API with automatic token refresh on 401
+   */
+  private async makeRequest(url: string, body: string, retryCount = 0): Promise<Response> {
+    const maxRetries = 1;
+
+    try {
+      const accessToken = await igdbAuthService.getAccessToken();
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Client-ID': this.clientId,
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body,
+      });
+
+      // If we get a 401, the token might have expired, refresh and retry once
+      if (response.status === 401 && retryCount < maxRetries) {
+        console.warn('Received 401, refreshing token and retrying...');
+        await igdbAuthService.forceRefresh();
+        return this.makeRequest(url, body, retryCount + 1);
+      }
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
+
+      return response;
+    } catch (error) {
+      console.error('Error making IGDB request:', error);
+      throw error;
     }
   }
 }
