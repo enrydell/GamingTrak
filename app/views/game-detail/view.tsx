@@ -34,49 +34,69 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({
     return getReleaseYear(game?.releaseDate);
   }, [game?.releaseDate]);
 
-  const renderContent = () => {
-    if (isLoading) {
-      return (
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#fff" />
         </View>
-      );
-    }
+      </View>
+    );
+  }
 
-    if (error) {
-      return (
+  if (error) {
+    return (
+      <View style={styles.container}>
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{error}</Text>
         </View>
-      );
-    }
+      </View>
+    );
+  }
 
-    if (!game) {
-      return (
+  if (!game) {
+    return (
+      <View style={styles.container}>
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>Jogo não encontrado</Text>
         </View>
-      );
-    }
+      </View>
+    );
+  }
 
-    return (
+  const backgroundUri = game?.coverUrl || '';
+
+  return (
+    <View style={styles.container}>
+      {backgroundUri && (
+        <Image
+          source={{ uri: backgroundUri }}
+          blurRadius={5}
+          style={styles.backgroundImage}
+          resizeMode="cover"
+        />
+      )}
+      <View style={styles.blurOverlay} />
       <ScrollView
-        contentContainerStyle={styles.contentContainer}
-        scrollEnabled={false}
+        style={styles.scrollContainer}
+        scrollEnabled={true}
+        showsVerticalScrollIndicator={false}
       >
-        <View style={styles.gameCardsContainer}>
+        <View style={styles.imageSection}>
           {game.coverUrl ? (
             <Image
               source={{ uri: game.coverUrl }}
-              style={styles.coverImage}
+              style={styles.gameImageLarge}
               onError={() => {
                 // Handle image loading error
               }}
             />
           ) : (
-            <View style={styles.coverImage} />
+            <View style={styles.gameImageLarge} />
           )}
+        </View>
 
+        <View style={styles.contentSection}>
           <Text style={styles.gameTitle} numberOfLines={3}>
             {game.name}
           </Text>
@@ -84,7 +104,7 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({
           <Text style={styles.releaseYear}>{releaseYear}</Text>
 
           {game.summary ? (
-            <Text style={styles.description} numberOfLines={6}>
+            <Text style={styles.description}>
               {game.summary}
             </Text>
           ) : (
@@ -94,25 +114,6 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({
           )}
         </View>
       </ScrollView>
-    );
-  };
-
-  const backgroundUri = game?.coverUrl || '';
-
-  return (
-    <View style={styles.container}>
-      {backgroundUri && (
-        <Image
-          source={{ uri: backgroundUri }}
-          blurRadius={10}
-          style={styles.backgroundImage}
-          resizeMode="cover"
-        />
-      )}
-      <View style={styles.blurOverlay} />
-      <View style={styles.contentWrapper}>
-        {renderContent()}
-      </View>
     </View>
   );
 };
