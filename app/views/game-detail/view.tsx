@@ -3,11 +3,11 @@
  * React component that renders the Game Detail UI
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import {
   ActivityIndicator,
+  Animated,
   Image,
-  ScrollView,
   Text,
   View,
 } from 'react-native';
@@ -33,6 +33,14 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({
   const releaseYear = useMemo(() => {
     return getReleaseYear(game?.releaseDate);
   }, [game?.releaseDate]);
+
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  const imageTranslateY = scrollY.interpolate({
+    inputRange: [0, 300],
+    outputRange: [0, 60],
+    extrapolate: 'clamp',
+  });
 
   if (isLoading) {
     return (
@@ -77,22 +85,31 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({
         />
       )}
       <View style={styles.blurOverlay} />
-      <ScrollView
+
+      <Animated.ScrollView
         style={styles.scrollContainer}
         scrollEnabled={true}
         showsVerticalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+        scrollEventThrottle={16}
       >
         <View style={styles.imageSection}>
-          {game.coverUrl ? (
-            <Image
+          {game.coverUrl && (
+            <Animated.Image
               source={{ uri: game.coverUrl }}
-              style={styles.gameImageLarge}
+              style={[
+                styles.gameImageLarge,
+                {
+                  transform: [{ translateY: imageTranslateY }],
+                },
+              ]}
               onError={() => {
                 // Handle image loading error
               }}
             />
-          ) : (
-            <View style={styles.gameImageLarge} />
           )}
         </View>
 
@@ -113,7 +130,7 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({
             </Text>
           )}
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
     </View>
   );
 };
