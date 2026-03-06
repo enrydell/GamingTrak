@@ -21,7 +21,7 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Link href="/views/search">Search</Link>
+      <Link href="/views/search">Buscar</Link>
     </View>
   );
 }
