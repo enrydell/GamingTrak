@@ -16,8 +16,6 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    width: '100%',
-    height: '100%',
   },
   blurOverlay: {
     position: 'absolute',
@@ -25,7 +23,12 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  contentWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   contentContainer: {
     flex: 1,

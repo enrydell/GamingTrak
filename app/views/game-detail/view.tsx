@@ -7,7 +7,6 @@ import React, { useMemo } from 'react';
 import {
   ActivityIndicator,
   Image,
-  ImageBackground,
   ScrollView,
   Text,
   View,
@@ -98,21 +97,22 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({
     );
   };
 
-  const backgroundUri = game?.backgroundUrl || '';
+  const backgroundUri = game?.coverUrl || '';
 
   return (
     <View style={styles.container}>
       {backgroundUri && (
-        <ImageBackground
+        <Image
           source={{ uri: backgroundUri }}
+          blurRadius={3}
           style={styles.backgroundImage}
           resizeMode="cover"
-        >
-          <View style={styles.blurOverlay} />
-        </ImageBackground>
+        />
       )}
-      {!backgroundUri && <View style={styles.blurOverlay} />}
-      {renderContent()}
+      <View style={styles.blurOverlay} />
+      <View style={styles.contentWrapper}>
+        {renderContent()}
+      </View>
     </View>
   );
 };
