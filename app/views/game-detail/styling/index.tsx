@@ -36,8 +36,8 @@ export const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   gameImageLarge: {
-    width: 150,
-    height: 210,
+    width: 200,
+    height: 300,
     borderRadius: 12,
     backgroundColor: '#e0e0e0',
     margin: 200,
